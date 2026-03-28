@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Badge, Button, Empty } from "@cloudflare/kumo";
+import { Button, Empty } from "@cloudflare/kumo";
 import { ArticleIcon, ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react";
 import type { Article, Feed } from "@cloud-reader/types";
 
@@ -81,12 +81,12 @@ export function ArticleList({
               type="button"
               onClick={() => onSelectArticle(article.id)}
               className={[
-                "w-full border-b border-kumo-line px-4 py-3 text-left transition-colors",
+                "w-full border-b border-kumo-line px-4 py-4 text-left transition-colors",
                 "hover:bg-kumo-tint",
                 selectedArticleId === article.id ? "bg-kumo-tint" : "",
               ].join(" ")}
             >
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-3">
                 <span
                   className={[
                     "line-clamp-2 text-sm leading-snug",
@@ -96,21 +96,22 @@ export function ArticleList({
                   {article.title ?? article.url}
                 </span>
                 {article.read === 0 && (
-                  <Badge variant="primary" className="mt-0.5 shrink-0">
-                    New
-                  </Badge>
+                  <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-kumo-brand" />
                 )}
               </div>
               {article.summary && (
-                <p className="mt-1 line-clamp-2 text-xs text-kumo-dimmed">
+                <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-kumo-dimmed">
                   {stripHtml(article.summary)}
                 </p>
               )}
-              <div className="mt-1 flex items-center gap-2 text-xs text-kumo-subtle">
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-kumo-subtle">
                 {!selectedFeed && (
-                  <span className="font-medium text-kumo-dimmed truncate">
-                    {feedsById[article.feedId]?.title ?? feedsById[article.feedId]?.url ?? ""}
-                  </span>
+                  <>
+                    <span className="truncate font-medium">
+                      {feedsById[article.feedId]?.title ?? feedsById[article.feedId]?.url ?? ""}
+                    </span>
+                    {article.publishedAt && <span aria-hidden>·</span>}
+                  </>
                 )}
                 {article.publishedAt && (
                   <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
