@@ -554,3 +554,26 @@ Feeds with full article content in `content:encoded` encode all HTML as XML enti
 - `entityExpansionLimit` is not a valid XMLParser option.
 - `htmlEntities: { maxTotalExpansions: ... }` does not control this path — it's a separate option.
 - 10,000 was not enough either — the feed has >10,000 entity expansions across 82 articles. Set to 100,000.
+
+---
+
+## Feed list sidebar redesign
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+- Replaced `Sidebar.MenuButton` + `Badge` pattern in the feeds list with a custom `<button>` per feed item
+- Unread count now on the left as a small brand-colored number, aligned to the top of the text
+- Feed title wraps (no `truncate`) so full site names are readable
+- `py-2.5` + `gap-0.5` between items gives more vertical breathing room
+- Active state uses `bg-kumo-tint font-medium text-kumo-strong` to match Kumo's own active style
+
+### Decisions made
+- **Custom `<button>` over `Sidebar.MenuButton`:** `Sidebar.MenuButton` is a fixed single-line
+  component — it truncates text and doesn't support left-side count placement. Custom button
+  gives full layout control while still using Kumo colour tokens for hover/active states.
+- **Unread count on left as plain number:** More scannable than a right-aligned badge.
+  A placeholder `<span>` of the same width is used when count is 0 to keep text aligned.
+
+### Dead ends / gotchas
+- None.

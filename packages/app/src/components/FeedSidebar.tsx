@@ -1,4 +1,4 @@
-import { Sidebar, Badge } from "@cloudflare/kumo";
+import { Sidebar } from "@cloudflare/kumo";
 import {
   RssIcon,
   ArrowsClockwiseIcon,
@@ -70,22 +70,35 @@ export function FeedSidebar({
         <Sidebar.Group>
           <Sidebar.GroupLabel>Feeds</Sidebar.GroupLabel>
           <Sidebar.GroupContent>
-            <Sidebar.Menu>
+            <ul className="flex flex-col gap-0.5 px-2">
               {feeds.map((feed) => {
                 const unread = unreadCounts[feed.id] ?? 0;
+                const isActive = selectedFeedId === feed.id;
                 return (
-                  <Sidebar.MenuItem key={feed.id}>
-                    <Sidebar.MenuButton
-                      active={selectedFeedId === feed.id}
+                  <li key={feed.id}>
+                    <button
+                      type="button"
                       onClick={() => onSelectFeed(feed.id)}
+                      className={[
+                        "flex w-full items-start gap-2.5 rounded-md px-2 py-2.5 text-left text-sm transition-colors",
+                        isActive
+                          ? "bg-kumo-tint font-medium text-kumo-strong"
+                          : "text-kumo-default hover:bg-kumo-tint",
+                      ].join(" ")}
                     >
-                      <span className="flex-1 truncate">{feed.title ?? feed.url}</span>
-                      {unread > 0 && <Badge variant="secondary">{unread}</Badge>}
-                    </Sidebar.MenuButton>
-                  </Sidebar.MenuItem>
+                      {unread > 0 ? (
+                        <span className="mt-0.5 min-w-[1.25rem] shrink-0 text-center text-xs font-semibold leading-none text-kumo-brand">
+                          {unread}
+                        </span>
+                      ) : (
+                        <span className="min-w-[1.25rem] shrink-0" />
+                      )}
+                      <span className="leading-snug">{feed.title ?? feed.url}</span>
+                    </button>
+                  </li>
                 );
               })}
-            </Sidebar.Menu>
+            </ul>
           </Sidebar.GroupContent>
         </Sidebar.Group>
       </Sidebar.Content>
