@@ -141,7 +141,7 @@ export function ArticleList({
                 "w-full border-b border-kumo-line text-left transition-colors",
                 "hover:bg-kumo-tint",
                 selectedArticleId === article.id ? "bg-kumo-tint" : "",
-                article.read === 1 ? "opacity-60" : "",
+                article.read === 1 ? "opacity-75" : "",
               ].join(" ")}
             >
               <div
