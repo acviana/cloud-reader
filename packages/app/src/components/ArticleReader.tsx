@@ -38,11 +38,12 @@ export function ArticleReader({ article, feed, onMarkRead }: ArticleReaderProps)
   return (
     <div className="flex h-full flex-col bg-kumo-base">
       {/* Toolbar */}
-      <div className="flex items-center justify-end gap-2 border-b border-kumo-line px-6 py-2">
+      <div className="flex items-center justify-end gap-2 border-b border-kumo-line bg-kumo-surface px-6 py-3">
         <Button
           variant={isRead ? "ghost" : "secondary"}
           size="sm"
           icon={<CheckIcon />}
+          className="w-32"
           onClick={() => onMarkRead(article.id, !isRead)}
         >
           {isRead ? "Mark unread" : "Mark read"}
@@ -63,7 +64,7 @@ export function ArticleReader({ article, feed, onMarkRead }: ArticleReaderProps)
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-2xl px-8 py-10">
           {/* Article header */}
-          <header className="mb-8">
+          <header className="mb-6">
             <h1 className="mb-3 text-3xl font-bold leading-tight tracking-tight">
               {article.url ? (
                 <a
@@ -92,6 +93,7 @@ export function ArticleReader({ article, feed, onMarkRead }: ArticleReaderProps)
               )}
             </div>
           </header>
+          <hr className="mb-8 border-kumo-line" />
 
           {/* Article body */}
           {article.content ? (

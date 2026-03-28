@@ -13,6 +13,7 @@ body,
 
 /* Article body — override prose colors with Kumo semantic tokens so dark mode works */
 .article-body {
+  font-family: Georgia, "Times New Roman", serif;
   color: var(--color-kumo-default);
   font-size: 1rem;
   line-height: 1.75;

@@ -512,6 +512,30 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 ---
 
+## Aesthetic improvements
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+- **`app.css`** — `font-family: Georgia, "Times New Roman", serif` on `.article-body`
+- **`ArticleList`** — article count inline with title (`All articles · 42`), removed separate count line
+- **`ArticleList`** — left border accent on unread cards (`border-l-2 border-kumo-brand`), transparent border on read cards to preserve layout stability
+- **`ArticleList`** — read cards `opacity-60` for clearer visual hierarchy
+- **`ArticleList`** — article list pane widened from `w-80` (320px) to `w-96` (384px)
+- **`ArticleReader`** — toolbar: `bg-kumo-surface` background, `py-3` padding
+- **`ArticleReader`** — mark-read button fixed `w-32` to prevent layout shift on label change
+- **`ArticleReader`** — `<hr>` separator between article header and body
+
+### Decisions made
+- **Both border and tint on selected+unread:** The blue left border is a read/unread indicator; the tint is a selection indicator. They're orthogonal so both show simultaneously.
+- **Transparent border on read cards:** Using `border-transparent` rather than no border keeps all cards the same total width — prevents layout shift when items transition read↔unread.
+- **`opacity-60` on read cards:** More visually effective than just dimming the title text alone, which was easy to miss.
+
+### Dead ends / gotchas
+- None.
+
+---
+
 ## Fix: fast-xml-parser entity expansion limit
 **Date:** 2026-03-28
 **Status:** Complete

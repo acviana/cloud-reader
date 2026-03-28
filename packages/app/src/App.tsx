@@ -144,7 +144,7 @@ export function App() {
       {/* Main content — two-pane: article list + reader */}
       <main className="flex h-full min-w-0 flex-1">
         {/* Article list pane */}
-        <div className="w-80 shrink-0 border-r border-kumo-line">
+        <div className="w-96 shrink-0 border-r border-kumo-line">
           <ArticleList
             articles={articles}
             selectedArticleId={selectedArticleId}
