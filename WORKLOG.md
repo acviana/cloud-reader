@@ -44,6 +44,34 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increment 2 — Worker package scaffold
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `packages/worker/package.json` — `@cloud-reader/worker`, deps: `drizzle-orm`, `fast-xml-parser`, `@cloud-reader/types`; devDeps: `wrangler`, `drizzle-kit`, `vitest`, `@cloudflare/workers-types`
+- `packages/worker/tsconfig.json` — extends root, adds `@cloudflare/workers-types`
+- `packages/worker/wrangler.jsonc` — D1 binding (placeholder `database_id` until increment 9), hourly cron trigger
+- `packages/worker/drizzle.config.ts` — `d1-http` driver, credentials from env vars
+- `packages/worker/vitest.config.ts` — Node environment, `src/**/*.test.ts`
+- `packages/worker/src/worker/index.ts` — minimal stub with correct `Env` interface and placeholder handlers
+- Root `package.json` updated with `pnpm.onlyBuiltDependencies` to approve native build scripts for `esbuild`, `sharp`, `workerd`
+
+### Decisions made
+- **`database_id: "placeholder"`** in `wrangler.jsonc` — actual ID requires running
+  `wrangler d1 create` which needs CF credentials. Deferred to increment 9.
+- **`drizzle.config.ts` uses env vars for credentials** — `CLOUDFLARE_ACCOUNT_ID`,
+  `CLOUDFLARE_DATABASE_ID`, `CLOUDFLARE_D1_TOKEN`. These are only needed for
+  `drizzle-kit studio` / remote operations, not for local dev or tests.
+- **`pnpm.onlyBuiltDependencies`** in root `package.json` — pnpm v9+ requires
+  explicit approval for packages that run install scripts. Added `esbuild`, `sharp`,
+  `workerd` (wrangler's runtime binary).
+
+### Dead ends / gotchas
+- `ScheduledEvent` is the wrong type for the `scheduled()` handler — the correct
+  type is `ScheduledController`. `ScheduledEvent` is the DOM event interface.
+  Fixed before committing.
+
 ## Increment 1 — Shared types package
 **Date:** 2026-03-27
 **Status:** Complete
