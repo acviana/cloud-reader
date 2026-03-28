@@ -1,6 +1,9 @@
-import { Badge, Empty } from "@cloudflare/kumo";
-import { ArticleIcon } from "@phosphor-icons/react";
+import { useState } from "react";
+import { Badge, Button, Empty } from "@cloudflare/kumo";
+import { ArticleIcon, ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react";
 import type { Article, Feed } from "@cloud-reader/types";
+
+type SortOrder = "desc" | "asc";
 
 interface ArticleListProps {
   articles: Article[];
@@ -15,7 +18,14 @@ export function ArticleList({
   selectedFeed,
   onSelectArticle,
 }: ArticleListProps) {
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const title = selectedFeed?.title ?? selectedFeed?.url ?? "All articles";
+
+  const sorted = [...articles].sort((a, b) => {
+    const tA = a.publishedAt ?? a.createdAt;
+    const tB = b.publishedAt ?? b.createdAt;
+    return sortOrder === "desc" ? tB - tA : tA - tB;
+  });
 
   if (articles.length === 0) {
     return (
@@ -37,12 +47,27 @@ export function ArticleList({
   return (
     <div className="flex h-full flex-col">
       <header className="border-b border-kumo-line px-4 py-3">
-        <h2 className="font-semibold text-kumo-strong">{title}</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-semibold text-kumo-strong">{title}</h2>
+          <Button
+            variant="ghost"
+            size="xs"
+            shape="square"
+            icon={sortOrder === "desc" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+            aria-label={sortOrder === "desc" ? "Oldest first" : "Newest first"}
+            title={
+              sortOrder === "desc"
+                ? "Showing newest first — click for oldest first"
+                : "Showing oldest first — click for newest first"
+            }
+            onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
+          />
+        </div>
         <p className="text-sm text-kumo-dimmed">{articles.length} articles</p>
       </header>
 
       <ul className="flex-1 overflow-y-auto">
-        {articles.map((article) => (
+        {sorted.map((article) => (
           <li key={article.id}>
             <button
               type="button"
