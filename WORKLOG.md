@@ -44,6 +44,40 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Pre-commit hook — Biome + Husky
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `biome.json` — root biome v2 config: linter (recommended rules + `noUnusedImports: error`),
+  formatter (2-space, 100 col, double quotes, trailing commas), file includes/excludes
+- `.husky/pre-commit` — runs `pnpm lint-staged` then `pnpm type-check`
+- `lint-staged` config in root `package.json` — biome lint + format on staged `*.ts/tsx/js/jsx`
+- Root scripts: `lint`, `format`
+- `husky` + `lint-staged` + `@biomejs/biome` installed as root devDependencies
+- `pnpm.onlyBuiltDependencies` already present — no changes needed
+
+### Decisions made
+- **Biome over ESLint:** Same tool as vega repo. Single binary, no plugin ecosystem to
+  manage, lint + format in one pass.
+- **Type-check only in hook (not full tests):** Pre-commit stays fast (~1-2s).
+  Full `vitest run` deferred to manual runs and CI.
+- **lint-staged for biome:** Only lints files staged for the current commit — avoids
+  re-linting the entire repo on every commit.
+
+### Options considered and discarded
+- **lefthook:** Used by Kumo repo. Rejected because husky is simpler, already used
+  by vega, and works well with pnpm workspaces.
+- **Running tests in pre-commit:** Rejected — test suite will grow and a slow hook
+  gets bypassed with `--no-verify`. Type-check catches the most common class of errors.
+
+### Dead ends / gotchas
+- Biome v2 changed the config schema from v1. `organizeImports` is now under
+  `assist.actions.source`, and `files.ignore` is now `files.includes` with `!` prefixes.
+  Running `biome migrate --write` fixed this automatically.
+- `biome lint --write` does not apply "unsafe" fixes — the `process.env["KEY"]` →
+  `process.env.KEY` suggestion required manual edits despite being trivially safe.
+
 ## Increment 2 — Worker package scaffold
 **Date:** 2026-03-27
 **Status:** Complete

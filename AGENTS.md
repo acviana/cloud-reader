@@ -59,6 +59,7 @@ cloud-reader/
 | UI components | `@cloudflare/kumo` | Cloudflare's own component library, built on Base UI, Tailwind v4 |
 | Testing | Vitest | Fast, native ESM, works in Node for D1 tests |
 | Monorepo | pnpm workspaces | Strict dependency isolation, fast installs, consistent with Kumo and vega repos |
+| Linter | Biome | Fast Rust-based linter + formatter, consistent with vega repo, single config at root |
 | Language | TypeScript (strict) | `strict: true` + `noUncheckedIndexedAccess` throughout |
 
 ---
@@ -158,6 +159,24 @@ Uses `Promise.allSettled` — one failing feed does not abort others.
 - **SQL:** Drizzle query builder for all queries, raw `sql` template tag only when necessary
 - **IDs:** always `crypto.randomUUID()`
 - **Timestamps:** always Unix milliseconds (`Date.now()`), stored as `integer`
+
+---
+
+## Pre-commit Hook
+
+Husky runs on every commit:
+1. **lint-staged** — biome lint + format on staged `*.ts/tsx/js/jsx` files only
+2. **type-check** — `tsc --noEmit` across all packages
+
+To run manually:
+```bash
+pnpm lint        # biome lint on entire repo
+pnpm format      # biome format --write on entire repo
+pnpm type-check  # tsc --noEmit across all packages
+```
+
+The hook is intentionally fast — tests are not run on commit. Run `pnpm test:run`
+manually or rely on CI for full test coverage.
 
 ---
 
