@@ -486,3 +486,26 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 ### Dead ends / gotchas
 - None.
+
+---
+
+## Delete feed button
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+- `TrashIcon` button in `ArticleList` header — only shown when a single feed is selected
+- Two-step inline confirmation: click trash → "Confirm" / "Cancel" appear in the header
+- `handleDeleteFeed` in `App.tsx`: calls `feedsApi.delete(id)`, clears `selectedFeedId`,
+  `articles`, and `selectedArticleId` — returns UI to global "All articles" view
+- `onDeleteFeed` prop on `ArticleList` (`(() => void) | null`)
+
+### Decisions made
+- **Inline confirm/cancel over a dialog:** A modal for a single destructive action is
+  heavy. Inline confirm keeps the interaction in-place and dismisses cleanly with Cancel.
+- **Delete returns to "All articles":** Avoids a broken empty pane for the deleted feed.
+- **Header location over sidebar:** Delete is contextual to the current feed view — the
+  article list header is the right place. Keeps the sidebar clean.
+
+### Dead ends / gotchas
+- None.

@@ -5,6 +5,7 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   ArrowsClockwiseIcon,
+  TrashIcon,
 } from "@phosphor-icons/react";
 import type { Article, Feed } from "@cloud-reader/types";
 
@@ -24,6 +25,7 @@ interface ArticleListProps {
   isRefreshing: boolean;
   onSelectArticle: (id: string) => void;
   onRefresh: (() => void) | null;
+  onDeleteFeed: (() => void) | null;
 }
 
 export function ArticleList({
@@ -34,8 +36,10 @@ export function ArticleList({
   isRefreshing,
   onSelectArticle,
   onRefresh,
+  onDeleteFeed,
 }: ArticleListProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const title = selectedFeed?.title ?? selectedFeed?.url ?? "All articles";
 
   const sorted = [...articles].sort((a, b) => {
@@ -92,6 +96,34 @@ export function ArticleList({
               }
               onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
             />
+            {onDeleteFeed &&
+              (confirmDelete ? (
+                <>
+                  <Button
+                    variant="destructive"
+                    size="xs"
+                    onClick={() => {
+                      onDeleteFeed();
+                      setConfirmDelete(false);
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                  <Button variant="ghost" size="xs" onClick={() => setConfirmDelete(false)}>
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  shape="square"
+                  icon={<TrashIcon />}
+                  aria-label="Delete feed"
+                  title="Delete feed and all its articles"
+                  onClick={() => setConfirmDelete(true)}
+                />
+              ))}
           </div>
         </div>
         <p className="text-sm text-kumo-dimmed">{articles.length} articles</p>

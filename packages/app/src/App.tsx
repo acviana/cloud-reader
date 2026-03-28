@@ -102,6 +102,14 @@ export function App() {
     [handleRefreshFeed],
   );
 
+  const handleDeleteFeed = useCallback(async (id: string) => {
+    await feedsApi.delete(id);
+    setFeeds((prev) => prev.filter((f) => f.id !== id));
+    setSelectedFeedId(null);
+    setArticles([]);
+    setSelectedArticleId(null);
+  }, []);
+
   const handleMarkRead = useCallback(async (id: string, read: boolean) => {
     const updated = await articlesApi.update(id, { read });
     setArticles((prev) => prev.map((a) => (a.id === id ? updated : a)));
@@ -145,6 +153,7 @@ export function App() {
             isRefreshing={selectedFeedId !== null && (isRefreshing[selectedFeedId] ?? false)}
             onSelectArticle={handleSelectArticle}
             onRefresh={selectedFeedId !== null ? () => handleRefreshFeed(selectedFeedId) : null}
+            onDeleteFeed={selectedFeedId !== null ? () => handleDeleteFeed(selectedFeedId) : null}
           />
         </div>
 
