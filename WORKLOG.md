@@ -44,6 +44,45 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increments 10–18 — Phase 2 Frontend
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `packages/app/` — full React SPA: Vite + Kumo + Tailwind v4 + `@phosphor-icons/react`
+- `src/lib/api.ts` — typed fetch wrappers for all 6 REST endpoints, `ApiError` class
+- `src/components/FeedSidebar.tsx` — Kumo `Sidebar` with feed list, unread badges, per-feed refresh, add feed button
+- `src/components/AddFeedDialog.tsx` — Kumo `Dialog` + `Field` + `Input` for adding feeds
+- `src/components/ArticleList.tsx` — article list with read/unread state, `Badge` for new articles
+- `src/components/ArticleReader.tsx` — article detail pane, mark read/unread, open original link
+- `src/App.tsx` — three-pane shell: sidebar + article list + reader, full state management
+- `wrangler.jsonc` updated with `assets` binding pointing to `packages/app/dist/`
+- `vite.config.ts` — `/api/*` proxied to wrangler dev server (port 8787)
+- Production deployed to `https://cloud-reader.alexcostaviana.workers.dev`
+
+### Decisions made
+- **`Toasty` removed for now:** Kumo's `Toasty` component requires `children` and
+  doesn't work as a standalone viewport. Deferred to phase 3 when proper toast
+  notification wiring is needed.
+- **CSS linting disabled in biome:** Tailwind v4's `@source` directive is not valid
+  standard CSS and biome flags it as an error even with overrides. CSS is linted by
+  Vite/Tailwind at build time instead.
+- **Auto-mark-read on article open:** Selecting an article marks it as read
+  automatically. Feels natural for an RSS reader.
+
+### Dead ends / gotchas
+- `Toasty.Provider` / `Toasty.Viewport` don't exist — `Toasty` is a flat component
+  wrapping both.
+- `exactOptionalPropertyTypes: true` causes issues with Kumo's `render` prop pattern
+  which spreads `className?: string` onto components expecting `className: string`.
+  Fixed with `className={props.className ?? ""}`.
+- `useCallback` dependency order matters — `handleAddFeed` originally referenced
+  `handleRefreshFeed` before it was declared, and had an empty dep array. Biome's
+  `useExhaustiveDependencies` rule caught this as a lint error during pre-commit.
+  Fixed by reordering the callbacks.
+- Biome v2 `@source` CSS parse error — fixed by disabling CSS linting globally in
+  biome.json (`css.linter.enabled: false`).
+
 ## Increment 9 — D1 database setup
 **Date:** 2026-03-27
 **Status:** Complete

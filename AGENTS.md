@@ -231,8 +231,8 @@ pnpm --filter @cloud-reader/worker db:studio
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| 1 | In progress | API layer — Worker, D1, REST endpoints, cron, Vitest |
-| 2 | Pending | Frontend — React, Vite, Kumo, static assets |
+| 1 | Complete | API layer — Worker, D1, REST endpoints, cron, Vitest |
+| 2 | Complete | Frontend — React, Vite, Kumo, static assets |
 | 3 | Deferred | Auth (Cloudflare Access), CLI tool, FTS5 search, OPML import/export |
 
 See `WORKLOG.md` for increment-by-increment progress and decisions.
