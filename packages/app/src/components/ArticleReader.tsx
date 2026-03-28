@@ -38,7 +38,7 @@ export function ArticleReader({ article, feed, onMarkRead }: ArticleReaderProps)
   return (
     <div className="flex h-full flex-col bg-kumo-base">
       {/* Toolbar */}
-      <div className="flex items-center justify-end gap-2 border-b border-kumo-line bg-kumo-surface px-6 py-3">
+      <div className="flex items-center justify-end gap-2 border-b border-kumo-line bg-kumo-base px-6 py-3">
         <Button
           variant={isRead ? "ghost" : "secondary"}
           size="sm"
