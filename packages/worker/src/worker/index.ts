@@ -6,6 +6,7 @@ import { articlesRouter } from "./routes/articles.ts";
 
 export interface Env {
   DB: D1Database;
+  ASSETS: Fetcher;
 }
 
 // Hono context variable: db is injected by middleware so routes are testable

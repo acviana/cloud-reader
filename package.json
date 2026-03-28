@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter @cloud-reader/worker dev",
     "build": "pnpm --filter @cloud-reader/app build",
-    "deploy": "pnpm run --filter @cloud-reader/worker deploy",
+    "deploy": "pnpm --filter @cloud-reader/app build && pnpm run --filter @cloud-reader/worker deploy",
     "test": "pnpm -r run test",
     "test:run": "pnpm -r run test:run",
     "type-check": "pnpm -r run type-check",

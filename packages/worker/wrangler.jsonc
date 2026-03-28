@@ -15,6 +15,14 @@
     }
   ],
 
+  // Static assets — Vite build output from packages/app
+  "assets": {
+    "directory": "../app/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
   // Hourly cron trigger for feed refresh
   "triggers": {
     "crons": ["0 * * * *"]
