@@ -44,6 +44,46 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increment 7 — Articles API + tests
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `src/worker/routes/articles.ts` — Hono router: `GET /` with `?feed_id` and
+  `?unread=true` query filters, `PATCH /:id` to mark read/unread
+- `src/worker/articles.test.ts` — 9 tests: list all, filter by feed_id, filter
+  by unread, combined filters, mark read, mark unread, 404 on unknown, 400 on
+  missing field, 400 on invalid JSON
+
+### Decisions made
+- **`and(...conditions)` for dynamic filters:** Build condition array based on
+  query params, spread into Drizzle's `and()`. Avoids nested if/else and works
+  cleanly with zero, one, or two conditions.
+- **`read` stored as integer, returned as integer:** The API returns `read: 0/1`
+  directly from the DB. The frontend and CLI convert to boolean as needed. This
+  keeps the DB representation transparent in the API response.
+
+### Dead ends / gotchas
+- None.
+
+---
+
+## Increment 8 — Cron handler + tests
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `src/worker/cron.test.ts` — 3 tests: refreshes all feeds, tolerates one
+  failure and continues, handles empty feed list
+
+### Decisions made
+- **`Promise.allSettled` in `runCron`:** Already in place from increment 6.
+  Tests confirm that a 500 response from one feed URL does not prevent other
+  feeds from being refreshed.
+
+### Dead ends / gotchas
+- None.
+
 ## Increment 6 — Feeds API + Hono router
 **Date:** 2026-03-27
 **Status:** Complete
