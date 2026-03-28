@@ -22,7 +22,7 @@ feedsRouter.post("/", async (c) => {
     return c.json({ error: "Invalid JSON body" }, 400);
   }
 
-  const feedUrl = (body as Record<string, unknown>)["url"];
+  const feedUrl = (body as Record<string, unknown>).url;
   if (typeof feedUrl !== "string" || !feedUrl.trim()) {
     return c.json({ error: "url is required" }, 400);
   }

@@ -37,5 +37,21 @@
       "!**/drizzle",
       "!**/pnpm-lock.yaml"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.test.ts", "**/*.test.tsx"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noFocusedTests": "error",
+            "noSkippedTests": "error"
+          },
+          "style": {
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    }
+  ]
 }

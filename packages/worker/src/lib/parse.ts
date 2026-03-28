@@ -133,7 +133,7 @@ function arr(val: unknown): unknown[] {
 function parseDate(val: string | null): number | null {
   if (!val) return null;
   const ms = Date.parse(val);
-  return isNaN(ms) ? null : ms;
+  return Number.isNaN(ms) ? null : ms;
 }
 
 /**
