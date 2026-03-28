@@ -54,8 +54,10 @@ cloud-reader/
 | Runtime | Cloudflare Workers | Edge deployment, free tier, native D1 binding |
 | Database | Cloudflare D1 (SQLite) | Serverless SQLite, integrated with Workers, supports Drizzle |
 | ORM | Drizzle ORM + drizzle-kit | Type-safe queries, proper migration support for D1, no `PRAGMA user_version` issues |
+| HTTP router | Hono | Lightweight, typed routing; `app.request()` enables clean unit tests without real D1 |
 | RSS parsing | `fast-xml-parser` | Pure JS, no native deps, works in Workers runtime, handles RSS 2.0 + Atom |
-| Frontend | React + Vite | Standard SPA setup, good Kumo compatibility |
+| Markdown rendering | `marked` | Converts markdown content to HTML for feeds that provide markdown bodies |
+| Frontend | React 19 + Vite | Standard SPA setup, good Kumo compatibility |
 | UI components | `@cloudflare/kumo` | Cloudflare's own component library, built on Base UI, Tailwind v4 |
 | Testing | Vitest | Fast, native ESM, works in Node for D1 tests |
 | Monorepo | pnpm workspaces | Strict dependency isolation, fast installs, consistent with Kumo and vega repos |
@@ -150,7 +152,16 @@ Uses `Promise.allSettled` — one failing feed does not abort others.
 
 ---
 
-## Conventions
+## Frontend Conventions
+
+- **Dark mode:** toggled via `document.documentElement.style.colorScheme`. Kumo uses CSS `light-dark()` internally so all tokens respond automatically. Never use `dark:` Tailwind prefixes.
+- **Semantic tokens only:** use `bg-kumo-base`, `text-kumo-default` etc. Never raw Tailwind colors (`bg-blue-500`).
+- **HTML entities in article cards:** use `DOMParser` to strip tags and decode all entities. Never manual regex replacement.
+- **Article content rendering:** `marked` converts markdown → HTML. Heuristic: if content contains HTML tags treat as HTML, otherwise parse as markdown.
+- **Sort order:** article list sorts client-side by `publishedAt ?? createdAt`. Default is newest-first.
+- **Auto-mark-read:** selecting an article marks it read automatically.
+
+## General Conventions
 
 - **Exports:** named exports only, no default exports except in `vite.config.ts` and worker entry
 - **File naming:** `kebab-case.ts`, test files colocated as `foo.test.ts`

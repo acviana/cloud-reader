@@ -350,3 +350,57 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 ### Dead ends / gotchas
 - None.
+
+---
+
+## Post-phase-2 fixes and features
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+
+**Content rendering**
+- Added `marked` for markdown → HTML conversion in `ArticleReader`
+- Heuristic: content with HTML tags treated as raw HTML, otherwise parsed as Markdown
+- Applied same renderer to `summary` fallback path
+- Added `@tailwindcss/typography` so `prose` classes apply typographic styles
+
+**Article sort order**
+- Toggle button in `ArticleList` header — newest/oldest first (default: newest)
+- Local state in `ArticleList`, resets on feed change
+- Falls back to `createdAt` for articles with no `publishedAt`
+
+**Article title as link**
+- `ArticleReader` title is an `<a>` opening the original URL in a new tab
+- Conditionally rendered — plain `<span>` if no URL
+
+**Site name in article reader**
+- `ArticleReader` receives `feed` prop, passed from `App` via `selectedArticleFeed`
+- Displays `feed.title · date` below title, separator only shown when both present
+
+**Site name on article cards**
+- `ArticleList` receives `feedsById: Record<string, Feed>` from `App`
+- Feed title shown on each card in "All articles" view only
+
+**HTML entity decoding**
+- Replaced manual regex entity list with `DOMParser`
+- Handles all named and numeric entities (`&#8217;`, `&mdash;`, etc.) in one pass
+
+**Dark mode toggle**
+- Moon/sun icon in sidebar footer, state in `App.tsx`
+- Initialises from `window.matchMedia("(prefers-color-scheme: dark)")`
+- Sets `document.documentElement.style.colorScheme` — Kumo's `light-dark()` tokens respond automatically
+
+**GitHub source link**
+- `GithubLogoIcon` + "Source code" in sidebar footer, opens repo in new tab
+
+### Decisions made
+- **`DOMParser` over regex:** Browser's own HTML parser handles every entity correctly. Previous regex only covered a handful of named entities.
+- **`marked` over custom renderer:** Small, fast, zero deps, synchronous mode works in React render.
+- **Dark mode via `colorScheme` not `.dark` class:** Kumo explicitly uses CSS `light-dark()` which responds to the `color-scheme` property, not a class toggle.
+- **Sort is client-side only:** API returns all articles already; a `?sort=` param adds API complexity for no real benefit at current scale.
+
+### Dead ends / gotchas
+- `Toasty.Provider` / `Toasty.Viewport` don't exist — `Toasty` is a flat component. Removed; toast notifications deferred to phase 3.
+- Biome CSS linter flags Tailwind v4's `@source` directive as invalid. Fixed by setting `css.linter.enabled: false` in `biome.json`.
+- `useCallback` dependency order: `handleAddFeed` referenced `handleRefreshFeed` before declaration with an empty dep array. Biome's `useExhaustiveDependencies` caught this at pre-commit. Fixed by reordering.
