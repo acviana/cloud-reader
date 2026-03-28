@@ -40,8 +40,19 @@ export function ArticleReader({ article, onMarkRead }: ArticleReaderProps) {
       {/* Article header */}
       <header className="flex items-start justify-between gap-4 border-b border-kumo-line px-6 py-4">
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-semibold leading-snug text-kumo-strong">
-            {article.title ?? "Untitled"}
+          <h1 className="text-xl font-semibold leading-snug">
+            {article.url ? (
+              <a
+                href={article.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-kumo-strong hover:text-kumo-brand hover:underline"
+              >
+                {article.title ?? "Untitled"}
+              </a>
+            ) : (
+              <span className="text-kumo-strong">{article.title ?? "Untitled"}</span>
+            )}
           </h1>
           {article.publishedAt && (
             <p className="mt-1 text-sm text-kumo-dimmed">
