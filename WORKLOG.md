@@ -44,6 +44,25 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increment 9 — D1 database setup
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `wrangler.jsonc` updated: `database_id` set to `996fad41-7d45-4254-8c22-aafd3950b673`,
+  `migrations_dir` set to `drizzle`
+- Migration `0000_silly_rumiko_fujikawa.sql` applied locally and remotely
+
+### Decisions made
+- **Kept binding name `DB`** (not `cloud_reader` as CF suggested) — `DB` is already
+  used throughout all route handlers and is cleaner.
+- **`migrations_dir: "drizzle"`** — wrangler defaults to `migrations/` but our
+  Drizzle-generated files live in `drizzle/`. This must be set explicitly.
+
+### Dead ends / gotchas
+- First `db:migrate` failed because `migrations_dir` was not set in `wrangler.jsonc`.
+  Wrangler looks for a `migrations/` folder by default and errors if it doesn't exist.
+
 ## Increment 7 — Articles API + tests
 **Date:** 2026-03-27
 **Status:** Complete
