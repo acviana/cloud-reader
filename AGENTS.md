@@ -219,6 +219,14 @@ pnpm --filter @cloud-reader/worker db:studio
 
 ---
 
+## Deployment
+
+- **Production URL:** `https://cloud-reader.alexcostaviana.workers.dev`
+- **Deploy command:** `pnpm run --filter @cloud-reader/worker deploy` (or `pnpm run deploy` from root)
+- **Local dev:** `pnpm dev` (uses local D1 via wrangler)
+
+---
+
 ## Phase Roadmap
 
 | Phase | Status | Description |
