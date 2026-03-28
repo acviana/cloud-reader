@@ -175,8 +175,8 @@ pnpm format      # biome format --write on entire repo
 pnpm type-check  # tsc --noEmit across all packages
 ```
 
-The hook is intentionally fast — tests are not run on commit. Run `pnpm test:run`
-manually or rely on CI for full test coverage.
+Tests are run on every commit as a guardrail — particularly important for agent-authored
+commits. `--passWithNoTests` is set so the hook doesn't fail before any test files exist.
 
 ---
 

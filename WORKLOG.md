@@ -60,8 +60,9 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 ### Decisions made
 - **Biome over ESLint:** Same tool as vega repo. Single binary, no plugin ecosystem to
   manage, lint + format in one pass.
-- **Type-check only in hook (not full tests):** Pre-commit stays fast (~1-2s).
-  Full `vitest run` deferred to manual runs and CI.
+- **Tests run in pre-commit:** Originally type-check only, but changed to also run
+  `pnpm test:run` as an agent guardrail — prevents agents from committing broken code
+  without noticing. `--passWithNoTests` prevents failure before test files exist.
 - **lint-staged for biome:** Only lints files staged for the current commit — avoids
   re-linting the entire repo on every commit.
 
