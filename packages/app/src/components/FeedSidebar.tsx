@@ -14,11 +14,11 @@ interface FeedSidebarProps {
   selectedFeedId: string | null;
   unreadCounts: Record<string, number>;
   isDark: boolean;
+  isRefreshingAll: boolean;
   onSelectFeed: (id: string | null) => void;
-  onRefreshFeed: (id: string) => void;
+  onRefreshAll: () => void;
   onAddFeed: () => void;
   onToggleDark: () => void;
-  isRefreshing: Record<string, boolean>;
 }
 
 export function FeedSidebar({
@@ -26,11 +26,11 @@ export function FeedSidebar({
   selectedFeedId,
   unreadCounts,
   isDark,
+  isRefreshingAll,
   onSelectFeed,
-  onRefreshFeed,
+  onRefreshAll,
   onAddFeed,
   onToggleDark,
-  isRefreshing,
 }: FeedSidebarProps) {
   return (
     <Sidebar>
@@ -53,6 +53,13 @@ export function FeedSidebar({
                 >
                   All articles
                 </Sidebar.MenuButton>
+                <Sidebar.MenuAction
+                  title="Refresh all feeds"
+                  onClick={onRefreshAll}
+                  disabled={isRefreshingAll}
+                >
+                  <ArrowsClockwiseIcon className={isRefreshingAll ? "animate-spin" : ""} />
+                </Sidebar.MenuAction>
               </Sidebar.MenuItem>
             </Sidebar.Menu>
           </Sidebar.GroupContent>
@@ -75,15 +82,6 @@ export function FeedSidebar({
                       <span className="flex-1 truncate">{feed.title ?? feed.url}</span>
                       {unread > 0 && <Badge variant="secondary">{unread}</Badge>}
                     </Sidebar.MenuButton>
-                    <Sidebar.MenuAction
-                      title="Refresh feed"
-                      onClick={() => onRefreshFeed(feed.id)}
-                      disabled={isRefreshing[feed.id]}
-                    >
-                      <ArrowsClockwiseIcon
-                        className={isRefreshing[feed.id] ? "animate-spin" : ""}
-                      />
-                    </Sidebar.MenuAction>
                   </Sidebar.MenuItem>
                 );
               })}

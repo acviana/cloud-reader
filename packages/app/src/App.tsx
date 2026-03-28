@@ -14,6 +14,7 @@ export function App() {
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [addFeedOpen, setAddFeedOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState<Record<string, boolean>>({});
+  const [isRefreshingAll, setIsRefreshingAll] = useState(false);
   const [isDark, setIsDark] = useState(
     () => window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
@@ -73,6 +74,24 @@ export function App() {
     [selectedFeedId],
   );
 
+  const handleRefreshAll = useCallback(async () => {
+    setIsRefreshingAll(true);
+    try {
+      await Promise.allSettled(feeds.map((f) => feedsApi.refresh(f.id)));
+      const opts = selectedFeedId ? { feedId: selectedFeedId } : undefined;
+      const [updatedArticles, updatedFeeds] = await Promise.all([
+        articlesApi.list(opts),
+        feedsApi.list(),
+      ]);
+      setArticles(updatedArticles);
+      setFeeds(updatedFeeds);
+    } catch (err) {
+      console.error("Refresh all failed:", err);
+    } finally {
+      setIsRefreshingAll(false);
+    }
+  }, [feeds, selectedFeedId]);
+
   const handleAddFeed = useCallback(
     async (url: string) => {
       const feed = await feedsApi.create({ url });
@@ -107,11 +126,11 @@ export function App() {
         selectedFeedId={selectedFeedId}
         unreadCounts={unreadCounts}
         isDark={isDark}
+        isRefreshingAll={isRefreshingAll}
         onSelectFeed={setSelectedFeedId}
-        onRefreshFeed={handleRefreshFeed}
+        onRefreshAll={handleRefreshAll}
         onAddFeed={() => setAddFeedOpen(true)}
         onToggleDark={() => setIsDark((d) => !d)}
-        isRefreshing={isRefreshing}
       />
 
       {/* Main content — two-pane: article list + reader */}
@@ -123,7 +142,9 @@ export function App() {
             selectedArticleId={selectedArticleId}
             selectedFeed={selectedFeed}
             feedsById={Object.fromEntries(feeds.map((f) => [f.id, f]))}
+            isRefreshing={selectedFeedId !== null && (isRefreshing[selectedFeedId] ?? false)}
             onSelectArticle={handleSelectArticle}
+            onRefresh={selectedFeedId !== null ? () => handleRefreshFeed(selectedFeedId) : null}
           />
         </div>
 

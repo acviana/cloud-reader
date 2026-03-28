@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Button, Empty } from "@cloudflare/kumo";
-import { ArticleIcon, ArrowUpIcon, ArrowDownIcon } from "@phosphor-icons/react";
+import {
+  ArticleIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ArrowsClockwiseIcon,
+} from "@phosphor-icons/react";
 import type { Article, Feed } from "@cloud-reader/types";
 
 type SortOrder = "desc" | "asc";
@@ -16,7 +21,9 @@ interface ArticleListProps {
   selectedArticleId: string | null;
   selectedFeed: Feed | null;
   feedsById: Record<string, Feed>;
+  isRefreshing: boolean;
   onSelectArticle: (id: string) => void;
+  onRefresh: (() => void) | null;
 }
 
 export function ArticleList({
@@ -24,7 +31,9 @@ export function ArticleList({
   selectedArticleId,
   selectedFeed,
   feedsById,
+  isRefreshing,
   onSelectArticle,
+  onRefresh,
 }: ArticleListProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const title = selectedFeed?.title ?? selectedFeed?.url ?? "All articles";
@@ -57,19 +66,33 @@ export function ArticleList({
       <header className="border-b border-kumo-line px-4 py-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-semibold text-kumo-strong">{title}</h2>
-          <Button
-            variant="ghost"
-            size="xs"
-            shape="square"
-            icon={sortOrder === "desc" ? <ArrowDownIcon /> : <ArrowUpIcon />}
-            aria-label={sortOrder === "desc" ? "Oldest first" : "Newest first"}
-            title={
-              sortOrder === "desc"
-                ? "Showing newest first — click for oldest first"
-                : "Showing oldest first — click for newest first"
-            }
-            onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
-          />
+          <div className="flex items-center gap-1">
+            {onRefresh && (
+              <Button
+                variant="ghost"
+                size="xs"
+                shape="square"
+                icon={<ArrowsClockwiseIcon className={isRefreshing ? "animate-spin" : ""} />}
+                aria-label="Refresh feed"
+                title="Refresh feed"
+                disabled={isRefreshing}
+                onClick={onRefresh}
+              />
+            )}
+            <Button
+              variant="ghost"
+              size="xs"
+              shape="square"
+              icon={sortOrder === "desc" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+              aria-label={sortOrder === "desc" ? "Oldest first" : "Newest first"}
+              title={
+                sortOrder === "desc"
+                  ? "Showing newest first — click for oldest first"
+                  : "Showing oldest first — click for newest first"
+              }
+              onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
+            />
+          </div>
         </div>
         <p className="text-sm text-kumo-dimmed">{articles.length} articles</p>
       </header>
