@@ -37,7 +37,7 @@ export function ArticleList({
 
   if (articles.length === 0) {
     return (
-      <div className="flex h-full flex-col">
+      <div className="flex h-full flex-col bg-kumo-base">
         <header className="border-b border-kumo-line px-4 py-3">
           <h2 className="font-semibold text-kumo-strong">{title}</h2>
         </header>
@@ -53,7 +53,7 @@ export function ArticleList({
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-kumo-base">
       <header className="border-b border-kumo-line px-4 py-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-semibold text-kumo-strong">{title}</h2>
