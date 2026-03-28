@@ -1,0 +1,31 @@
+{
+  "name": "@cloud-reader/app",
+  "version": "0.0.1",
+  "private": true,
+  "description": "cloud-reader React frontend",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "type-check": "tsc --noEmit",
+    "test": "echo 'no tests in app package yet' && exit 0",
+    "test:run": "echo 'no tests in app package yet' && exit 0"
+  },
+  "dependencies": {
+    "@cloud-reader/types": "workspace:*",
+    "@cloudflare/kumo": "^1.16.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@tailwindcss/vite": "^4.2.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.2.2",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.3.1"
+  }
+}

@@ -40,6 +40,16 @@
   },
   "overrides": [
     {
+      "includes": ["**/app.css"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noInvalidPositionAtImportRule": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["**/*.test.ts", "**/*.test.tsx"],
       "linter": {
         "rules": {
