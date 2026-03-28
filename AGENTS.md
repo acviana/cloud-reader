@@ -177,7 +177,7 @@ Uses `Promise.allSettled` — one failing feed does not abort others.
 
 ## Frontend Conventions
 
-- **Dark mode:** toggled via `document.documentElement.style.colorScheme`. Kumo uses CSS `light-dark()` internally so all tokens respond automatically. Never use `dark:` Tailwind prefixes.
+- **Dark mode:** toggled via `document.documentElement.style.colorScheme`. Kumo uses CSS `light-dark()` internally so all tokens respond automatically. Never use `dark:` Tailwind prefixes. Default is **light mode** (`isDark` initialises to `false`) — does not follow OS preference.
 - **No app-wide custom theming:** Kumo owns its component colours via `light-dark()` and `--color-kumo-*` variables. Theming only the parts we own (article body, cards) while Kumo's chrome stays neutral looks fragmented. Stick to Kumo's light/dark toggle.
 - **Semantic tokens only:** use `bg-kumo-base`, `text-kumo-default` etc. Never raw Tailwind colors (`bg-blue-500`).
 - **All content panes must have `bg-kumo-base`:** the sidebar has its own background from Kumo; the article list and reader must explicitly set `bg-kumo-base` or they'll use the browser default and look wrong in dark mode. Note: `bg-kumo-surface` is a visibly different (elevated) color — do not use it for pane backgrounds, only for cards/dialogs that sit above the base layer.

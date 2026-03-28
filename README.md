@@ -14,7 +14,7 @@ A personal RSS reader built entirely on Cloudflare — Worker, D1, and static as
 - Sort articles newest or oldest first
 - Markdown and HTML article content rendering
 - Article titles link to original posts
-- Dark/light mode toggle (follows OS preference by default)
+- Dark/light mode toggle (defaults to light mode)
 - Resizable three-pane layout: feed sidebar, article list, article reader
 - REST API is fully `curl`-able — no auth in phase 1
 

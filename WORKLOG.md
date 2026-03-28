@@ -577,3 +577,17 @@ Feeds with full article content in `content:encoded` encode all HTML as XML enti
 
 ### Dead ends / gotchas
 - None.
+
+---
+
+## Default to light mode
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+- `isDark` in `App.tsx` initialises to `false` instead of reading from `window.matchMedia`
+
+### Decisions made
+- **Light mode default over OS preference:** The app looks better in light mode at this
+  stage of polish. The toggle is still available for users who prefer dark. Removing the
+  `matchMedia` call also avoids a flash of dark mode on first load for OS dark mode users.

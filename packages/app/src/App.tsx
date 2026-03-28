@@ -15,9 +15,7 @@ export function App() {
   const [addFeedOpen, setAddFeedOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState<Record<string, boolean>>({});
   const [isRefreshingAll, setIsRefreshingAll] = useState(false);
-  const [isDark, setIsDark] = useState(
-    () => window.matchMedia("(prefers-color-scheme: dark)").matches,
-  );
+  const [isDark, setIsDark] = useState(false);
 
   // Apply color-scheme to <html> — Kumo's light-dark() tokens respond to this
   useEffect(() => {
