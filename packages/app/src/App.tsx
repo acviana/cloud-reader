@@ -14,6 +14,14 @@ export function App() {
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [addFeedOpen, setAddFeedOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState<Record<string, boolean>>({});
+  const [isDark, setIsDark] = useState(
+    () => window.matchMedia("(prefers-color-scheme: dark)").matches,
+  );
+
+  // Apply color-scheme to <html> — Kumo's light-dark() tokens respond to this
+  useEffect(() => {
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+  }, [isDark]);
 
   // Load feeds on mount
   useEffect(() => {
@@ -98,9 +106,11 @@ export function App() {
         feeds={feeds}
         selectedFeedId={selectedFeedId}
         unreadCounts={unreadCounts}
+        isDark={isDark}
         onSelectFeed={setSelectedFeedId}
         onRefreshFeed={handleRefreshFeed}
         onAddFeed={() => setAddFeedOpen(true)}
+        onToggleDark={() => setIsDark((d) => !d)}
         isRefreshing={isRefreshing}
       />
 

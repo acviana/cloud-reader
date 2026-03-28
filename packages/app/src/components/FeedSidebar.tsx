@@ -1,14 +1,22 @@
-import { Sidebar, Badge } from "@cloudflare/kumo";
-import { RssIcon, ArrowsClockwiseIcon, GithubLogoIcon } from "@phosphor-icons/react";
+import { Sidebar, Badge, Button } from "@cloudflare/kumo";
+import {
+  RssIcon,
+  ArrowsClockwiseIcon,
+  GithubLogoIcon,
+  MoonIcon,
+  SunIcon,
+} from "@phosphor-icons/react";
 import type { Feed } from "@cloud-reader/types";
 
 interface FeedSidebarProps {
   feeds: Feed[];
   selectedFeedId: string | null;
   unreadCounts: Record<string, number>;
+  isDark: boolean;
   onSelectFeed: (id: string | null) => void;
   onRefreshFeed: (id: string) => void;
   onAddFeed: () => void;
+  onToggleDark: () => void;
   isRefreshing: Record<string, boolean>;
 }
 
@@ -16,9 +24,11 @@ export function FeedSidebar({
   feeds,
   selectedFeedId,
   unreadCounts,
+  isDark,
   onSelectFeed,
   onRefreshFeed,
   onAddFeed,
+  onToggleDark,
   isRefreshing,
 }: FeedSidebarProps) {
   return (
@@ -94,7 +104,18 @@ export function FeedSidebar({
             </Sidebar.MenuButton>
           </Sidebar.MenuItem>
         </Sidebar.Menu>
-        <Sidebar.Trigger />
+        <div className="flex items-center justify-between px-2 pb-1">
+          <Button
+            variant="ghost"
+            size="xs"
+            shape="square"
+            icon={isDark ? <SunIcon /> : <MoonIcon />}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            onClick={onToggleDark}
+          />
+          <Sidebar.Trigger />
+        </div>
       </Sidebar.Footer>
     </Sidebar>
   );
