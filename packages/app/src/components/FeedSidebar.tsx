@@ -1,5 +1,5 @@
 import { Sidebar, Badge } from "@cloudflare/kumo";
-import { RssIcon, ArrowsClockwiseIcon } from "@phosphor-icons/react";
+import { RssIcon, ArrowsClockwiseIcon, GithubLogoIcon } from "@phosphor-icons/react";
 import type { Feed } from "@cloud-reader/types";
 
 interface FeedSidebarProps {
@@ -78,6 +78,20 @@ export function FeedSidebar({
         <Sidebar.Menu>
           <Sidebar.MenuItem>
             <Sidebar.MenuButton onClick={onAddFeed}>+ Add feed</Sidebar.MenuButton>
+          </Sidebar.MenuItem>
+          <Sidebar.MenuItem>
+            <Sidebar.MenuButton
+              icon={<GithubLogoIcon />}
+              onClick={() =>
+                window.open(
+                  "https://github.com/acviana/cloud-reader",
+                  "_blank",
+                  "noopener,noreferrer",
+                )
+              }
+            >
+              Source code
+            </Sidebar.MenuButton>
           </Sidebar.MenuItem>
         </Sidebar.Menu>
         <Sidebar.Trigger />
