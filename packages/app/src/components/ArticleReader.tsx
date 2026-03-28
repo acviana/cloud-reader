@@ -1,6 +1,19 @@
 import { Button, Empty } from "@cloudflare/kumo";
 import { ArticleIcon, ArrowSquareOutIcon, CheckIcon } from "@phosphor-icons/react";
+import { marked } from "marked";
 import type { Article } from "@cloud-reader/types";
+
+/**
+ * Render article body content as HTML.
+ * RSS feeds may provide HTML (content:encoded) or Markdown.
+ * Heuristic: if the string contains HTML tags, treat as HTML; otherwise parse as Markdown.
+ */
+function renderContent(raw: string): string {
+  const looksLikeHtml = /<[a-z][\s\S]*>/i.test(raw);
+  if (looksLikeHtml) return raw;
+  // Parse markdown synchronously
+  return marked.parse(raw, { async: false }) as string;
+}
 
 interface ArticleReaderProps {
   article: Article | null;
@@ -70,10 +83,14 @@ export function ArticleReader({ article, onMarkRead }: ArticleReaderProps) {
           <div
             className="prose prose-sm max-w-none text-kumo-default"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: article content from trusted RSS feeds
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: renderContent(article.content) }}
           />
         ) : article.summary ? (
-          <p className="text-kumo-default">{article.summary}</p>
+          <div
+            className="prose prose-sm max-w-none text-kumo-default"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: article summary from trusted RSS feeds
+            dangerouslySetInnerHTML={{ __html: renderContent(article.summary) }}
+          />
         ) : (
           <div className="flex h-full items-center justify-center">
             <Empty
