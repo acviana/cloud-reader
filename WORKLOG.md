@@ -44,6 +44,31 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increment 3 — DB schema + migration
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `packages/worker/src/db/schema.ts` — Drizzle schema for `feeds` and `articles` tables
+  with all finalized columns, foreign key with `ON DELETE CASCADE`, and three explicit
+  indexes on `articles`: `idx_articles_feed_id`, `idx_articles_read`, `idx_articles_published_at`
+- `packages/worker/drizzle/0000_silly_rumiko_fujikawa.sql` — generated migration
+- `packages/worker/drizzle/meta/` — drizzle-kit journal and snapshot
+
+### Decisions made
+- **Explicit index definitions in schema:** Drizzle does not auto-generate query
+  indexes — only unique indexes. The three query indexes (`feed_id`, `read`,
+  `published_at`) were added using `index()` in the third argument of `sqliteTable`.
+- **`published_at` index is not DESC:** Drizzle's SQLite `index()` helper does not
+  support descending index direction. A plain ascending index on `published_at` still
+  helps the query planner for `ORDER BY published_at DESC` on small-to-medium datasets.
+
+### Dead ends / gotchas
+- Generated migration twice. First run lacked indexes (Drizzle only auto-generates
+  unique indexes, not query indexes). Had to add `index()` calls to the schema and
+  regenerate. The `drizzle/` folder was wiped and regenerated from scratch to get a
+  clean `0000_` migration rather than `0001_`.
+
 ## Pre-commit hook — Biome + Husky
 **Date:** 2026-03-27
 **Status:** Complete
