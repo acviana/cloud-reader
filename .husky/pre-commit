@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Run biome lint+format on staged files, then type-check all packages
+
+pnpm lint-staged
+pnpm type-check

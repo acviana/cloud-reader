@@ -9,13 +9,31 @@
     "deploy": "pnpm --filter @cloud-reader/worker deploy",
     "test": "pnpm -r run test",
     "test:run": "pnpm -r run test:run",
-    "type-check": "pnpm -r run type-check"
+    "type-check": "pnpm -r run type-check",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "biome lint --write --no-errors-on-unmatched",
+      "biome format --write --no-errors-on-unmatched"
+    ]
   },
   "engines": {
     "node": ">=20",
     "pnpm": ">=9"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "sharp", "workerd"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "workerd"
+    ]
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.9",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
   }
 }
