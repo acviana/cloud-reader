@@ -1,7 +1,7 @@
 import { Button, Empty } from "@cloudflare/kumo";
 import { ArticleIcon, ArrowSquareOutIcon, CheckIcon } from "@phosphor-icons/react";
 import { marked } from "marked";
-import type { Article } from "@cloud-reader/types";
+import type { Article, Feed } from "@cloud-reader/types";
 
 /**
  * Render article body content as HTML.
@@ -17,10 +17,11 @@ function renderContent(raw: string): string {
 
 interface ArticleReaderProps {
   article: Article | null;
+  feed: Feed | null;
   onMarkRead: (id: string, read: boolean) => void;
 }
 
-export function ArticleReader({ article, onMarkRead }: ArticleReaderProps) {
+export function ArticleReader({ article, feed, onMarkRead }: ArticleReaderProps) {
   if (!article) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -54,15 +55,19 @@ export function ArticleReader({ article, onMarkRead }: ArticleReaderProps) {
               <span className="text-kumo-strong">{article.title ?? "Untitled"}</span>
             )}
           </h1>
-          {article.publishedAt && (
-            <p className="mt-1 text-sm text-kumo-dimmed">
-              {new Date(article.publishedAt).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
+          <div className="mt-1 flex items-center gap-2 text-sm text-kumo-dimmed">
+            {feed && <span>{feed.title ?? feed.url}</span>}
+            {feed && article.publishedAt && <span aria-hidden>·</span>}
+            {article.publishedAt && (
+              <span>
+                {new Date(article.publishedAt).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex shrink-0 gap-2">

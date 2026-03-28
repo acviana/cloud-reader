@@ -40,6 +40,9 @@ export function App() {
 
   const selectedFeed = feeds.find((f) => f.id === selectedFeedId) ?? null;
   const selectedArticle = articles.find((a) => a.id === selectedArticleId) ?? null;
+  const selectedArticleFeed = selectedArticle
+    ? (feeds.find((f) => f.id === selectedArticle.feedId) ?? null)
+    : null;
 
   const handleRefreshFeed = useCallback(
     async (id: string) => {
@@ -116,7 +119,11 @@ export function App() {
 
         {/* Article reader pane */}
         <div className="min-w-0 flex-1">
-          <ArticleReader article={selectedArticle} onMarkRead={handleMarkRead} />
+          <ArticleReader
+            article={selectedArticle}
+            feed={selectedArticleFeed}
+            onMarkRead={handleMarkRead}
+          />
         </div>
       </main>
 
