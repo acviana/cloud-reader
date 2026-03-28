@@ -160,4 +160,27 @@ describe("parseFeed — edge cases", () => {
   it("returns null for valid XML that is not RSS or Atom", () => {
     expect(parseFeed(UNKNOWN_XML)).toBeNull();
   });
+
+  it("parses feeds with many HTML entities in content:encoded", () => {
+    // Simulate a feed where content:encoded contains lots of escaped HTML
+    // (e.g. Astro blogs). Default entity limit of 1000 would fail this.
+    const manyEntities = "&lt;p&gt;text&lt;/p&gt;".repeat(100);
+    const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Entity Heavy Feed</title>
+    <link>https://example.com</link>
+    <description>Feed with lots of entities</description>
+    <item>
+      <title>Rich Article</title>
+      <link>https://example.com/rich</link>
+      <content:encoded>${manyEntities}</content:encoded>
+    </item>
+  </channel>
+</rss>`;
+    const result = parseFeed(feed);
+    expect(result).not.toBeNull();
+    expect(result!.articles).toHaveLength(1);
+    expect(result!.articles[0]!.content).toContain("<p>text</p>");
+  });
 });

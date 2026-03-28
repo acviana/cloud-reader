@@ -5,6 +5,9 @@ const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: "@_",
   isArray: (name) => ["item", "entry"].includes(name),
+  // Raise entity expansion limit — default of 1000 is too low for feeds with
+  // rich content:encoded fields containing many escaped HTML entities.
+  processEntities: { maxTotalExpansions: 100000 },
 });
 
 /**

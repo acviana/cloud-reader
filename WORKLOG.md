@@ -509,3 +509,24 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 ### Dead ends / gotchas
 - None.
+
+---
+
+## Fix: fast-xml-parser entity expansion limit
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+- `processEntities: { maxTotalExpansions: 100000 }` in `XMLParser` config in `src/lib/parse.ts`
+- Regression test added: feeds with >1000 HTML entities in `content:encoded` now parse correctly
+
+### Root cause
+`fast-xml-parser` defaults to `processEntities: true` (boolean), which sets `maxTotalExpansions: 1000`.
+Feeds with full article content in `content:encoded` encode all HTML as XML entities (`&lt;`, `&gt;`,
+`&amp;`, etc.). A feed with 82 articles easily exceeds 10,000 entity expansions. Parser threw
+`Entity expansion limit exceeded`, `parseFeed()` returned `null`, Worker returned 502.
+
+### Dead ends / gotchas
+- `entityExpansionLimit` is not a valid XMLParser option.
+- `htmlEntities: { maxTotalExpansions: ... }` does not control this path — it's a separate option.
+- 10,000 was not enough either — the feed has >10,000 entity expansions across 82 articles. Set to 100,000.
