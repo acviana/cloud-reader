@@ -1,13 +1,125 @@
-import { Button } from "@cloudflare/kumo";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Sidebar } from "@cloudflare/kumo";
+import type { Article, Feed } from "@cloud-reader/types";
+import { articlesApi, feedsApi } from "./lib/api.ts";
+import { FeedSidebar } from "./components/FeedSidebar.tsx";
+import { AddFeedDialog } from "./components/AddFeedDialog.tsx";
+import { ArticleList } from "./components/ArticleList.tsx";
+import { ArticleReader } from "./components/ArticleReader.tsx";
 
 export function App() {
+  const [feeds, setFeeds] = useState<Feed[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const [addFeedOpen, setAddFeedOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState<Record<string, boolean>>({});
+
+  // Load feeds on mount
+  useEffect(() => {
+    feedsApi.list().then(setFeeds).catch(console.error);
+  }, []);
+
+  // Load articles when selected feed changes
+  useEffect(() => {
+    const opts = selectedFeedId ? { feedId: selectedFeedId } : undefined;
+    articlesApi.list(opts).then(setArticles).catch(console.error);
+    setSelectedArticleId(null);
+  }, [selectedFeedId]);
+
+  // Unread counts per feed
+  const unreadCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const article of articles) {
+      if (article.read === 0) {
+        counts[article.feedId] = (counts[article.feedId] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }, [articles]);
+
+  const selectedFeed = feeds.find((f) => f.id === selectedFeedId) ?? null;
+  const selectedArticle = articles.find((a) => a.id === selectedArticleId) ?? null;
+
+  const handleRefreshFeed = useCallback(
+    async (id: string) => {
+      setIsRefreshing((prev) => ({ ...prev, [id]: true }));
+      try {
+        await feedsApi.refresh(id);
+        // Reload articles for current view
+        const opts = selectedFeedId ? { feedId: selectedFeedId } : undefined;
+        const updated = await articlesApi.list(opts);
+        setArticles(updated);
+        // Refresh feed metadata
+        const updatedFeeds = await feedsApi.list();
+        setFeeds(updatedFeeds);
+      } catch (err) {
+        console.error("Refresh failed:", err);
+      } finally {
+        setIsRefreshing((prev) => ({ ...prev, [id]: false }));
+      }
+    },
+    [selectedFeedId],
+  );
+
+  const handleAddFeed = useCallback(
+    async (url: string) => {
+      const feed = await feedsApi.create({ url });
+      setFeeds((prev) => [...prev, feed]);
+      // Auto-refresh after adding
+      handleRefreshFeed(feed.id);
+    },
+    [handleRefreshFeed],
+  );
+
+  const handleMarkRead = useCallback(async (id: string, read: boolean) => {
+    const updated = await articlesApi.update(id, { read });
+    setArticles((prev) => prev.map((a) => (a.id === id ? updated : a)));
+  }, []);
+
+  const handleSelectArticle = useCallback(
+    async (id: string) => {
+      setSelectedArticleId(id);
+      // Mark as read automatically on open
+      const article = articles.find((a) => a.id === id);
+      if (article && article.read === 0) {
+        await handleMarkRead(id, true);
+      }
+    },
+    [articles, handleMarkRead],
+  );
+
   return (
-    <div className="flex h-full items-center justify-center bg-kumo-base">
-      <div className="flex flex-col items-center gap-4">
-        <h1 className="text-2xl font-semibold text-kumo-default">cloud-reader</h1>
-        <p className="text-kumo-dimmed">Phase 2 in progress</p>
-        <Button variant="primary">Get started</Button>
-      </div>
-    </div>
+    <Sidebar.Provider defaultOpen className="h-full">
+      <FeedSidebar
+        feeds={feeds}
+        selectedFeedId={selectedFeedId}
+        unreadCounts={unreadCounts}
+        onSelectFeed={setSelectedFeedId}
+        onRefreshFeed={handleRefreshFeed}
+        onAddFeed={() => setAddFeedOpen(true)}
+        isRefreshing={isRefreshing}
+      />
+
+      {/* Main content — two-pane: article list + reader */}
+      <main className="flex h-full min-w-0 flex-1">
+        {/* Article list pane */}
+        <div className="w-80 shrink-0 border-r border-kumo-line">
+          <ArticleList
+            articles={articles}
+            selectedArticleId={selectedArticleId}
+            selectedFeed={selectedFeed}
+            onSelectArticle={handleSelectArticle}
+          />
+        </div>
+
+        {/* Article reader pane */}
+        <div className="min-w-0 flex-1">
+          <ArticleReader article={selectedArticle} onMarkRead={handleMarkRead} />
+        </div>
+      </main>
+
+      <AddFeedDialog open={addFeedOpen} onOpenChange={setAddFeedOpen} onAdd={handleAddFeed} />
+    </Sidebar.Provider>
   );
 }
