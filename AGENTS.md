@@ -6,6 +6,29 @@ Read it fully before making changes.
 
 ---
 
+## Agent Rules
+
+These rules are mandatory. Follow them on every task without exception.
+
+1. **Update `WORKLOG.md` before every commit.** Every commit must have a
+   corresponding worklog entry documenting what was built, decisions made,
+   options considered and discarded, and any dead ends or gotchas. Do not
+   commit code without updating the worklog first.
+
+2. **Update `AGENTS.md` before every commit** if the task introduced new
+   conventions, stack changes, architectural decisions, or anything a future
+   agent would need to know to work in this codebase. When in doubt, add it.
+
+3. **Never commit without running the pre-commit checks.** The hook runs
+   lint → type-check → tests. All three must pass. If tests fail, fix them
+   before committing — do not skip with `--no-verify`.
+
+4. **Read `WORKLOG.md` before starting any task.** It contains decisions
+   already made and dead ends already explored. Do not re-litigate settled
+   decisions without a good reason.
+
+---
+
 ## What This Is
 
 A self-hosted RSS reader with:
