@@ -43,3 +43,34 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 ---
 
 <!-- New increments are appended below this line -->
+
+## Increment 1 — Shared types package
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `packages/types/package.json` — `@cloud-reader/types` workspace package
+- `packages/types/tsconfig.json` — extends root tsconfig
+- `packages/types/src/index.ts` — canonical types:
+  - `Feed`, `NewFeed`
+  - `Article`, `UpdateArticle`
+  - `RefreshResult`, `ApiError`
+  - `ParsedFeed`, `ParsedFeedMeta`, `ParsedArticle` — internal shape from parser
+
+### Decisions made
+- **No runtime code:** Package is types-only. The `exports` field points directly
+  to `src/index.ts` — no build step needed for a types-only package.
+- **`ParsedFeed` types included here:** Even though `parse.ts` lives in the worker,
+  the parsed feed shape is defined in types so the CLI could eventually use it too
+  if it ever parses feeds locally.
+- **`read` stays as `number` (not `boolean`):** SQLite stores booleans as integers.
+  The `Article` interface reflects the DB representation (`0` / `1`) to avoid
+  silent coercion bugs. The API layer converts to boolean when needed.
+
+### Options considered and discarded
+- **Separate `ParsedFeed` types in worker:** Rejected — if the CLI ever parses feeds
+  locally, it would need to duplicate these types. Defining them in `@cloud-reader/types`
+  is free and keeps the canonical source clear.
+
+### Dead ends / gotchas
+- None.
