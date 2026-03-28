@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "cloud-reader",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2025-03-27",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // D1 database binding — database_id filled in during increment 9
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cloud-reader",
+      "database_id": "placeholder"
+    }
+  ],
+
+  // Hourly cron trigger for feed refresh
+  "triggers": {
+    "crons": ["0 * * * *"]
+  }
+}
