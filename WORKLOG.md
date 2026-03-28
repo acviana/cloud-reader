@@ -44,6 +44,33 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increment 4 — RSS parsing + tests
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `packages/worker/src/lib/parse.ts` — `parseFeed(xml)` normalizes RSS 2.0 and Atom
+  feeds into `ParsedFeed`. Handles: feed metadata (title, siteUrl, description, imageUrl),
+  articles (url, title, summary, content, publishedAt), `content:encoded`, CDATA, Atom
+  text constructs, Atom link rel filtering, fallback from `published` → `updated`.
+- `packages/worker/src/lib/parse.test.ts` — 12 tests covering RSS 2.0, Atom, and edge
+  cases (no image, no pubDate, invalid XML, unrecognized XML format).
+
+### Decisions made
+- **`fast-xml-parser` with `isArray` for `item`/`entry`:** Single-item feeds would
+  otherwise return an object instead of an array. The `isArray` option forces consistent
+  array output.
+- **Filter articles with empty URL:** Articles with no resolvable URL are dropped
+  rather than stored with an empty string, which would violate the `NOT NULL` constraint
+  and cause upsert collisions.
+- **`parseFeed` returns `null` on unrecognized format:** Caller decides how to handle
+  (log and skip vs. error).
+
+### Dead ends / gotchas
+- `allowImportingTsExtensions: true` is required in `tsconfig.json` to import
+  `./parse.ts` with the `.ts` extension in test files. Without it, tsc errors even
+  though Vitest handles it fine at runtime.
+
 ## Increment 3 — DB schema + migration
 **Date:** 2026-03-27
 **Status:** Complete
