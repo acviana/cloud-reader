@@ -44,6 +44,39 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increment 6 — Feeds API + Hono router
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `hono` added as a runtime dependency
+- `src/worker/index.ts` — refactored to use `createApp(dbOverride?)` factory with
+  Hono. DB injected via context variable middleware so routes are testable without
+  a real D1 binding.
+- `src/worker/routes/feeds.ts` — Hono router: `GET /`, `POST /`, `DELETE /:id`,
+  `POST /:id/refresh`
+- `src/worker/routes/articles.ts` — stub returning 501 (implemented in increment 7)
+- `src/worker/cron.ts` — `runCron(db)` extracted from index
+- `src/worker/feeds.test.ts` — 11 tests using `app.request()` with in-memory DB
+
+### Decisions made
+- **Hono over hand-rolled routing:** Switched at user request. Hono gives typed
+  routing, `c.req.param()`, `c.json()`, middleware, and `app.request()` for testing
+  — eliminates all the manual URL parsing and method switching.
+- **`createApp(dbOverride?)` factory:** Allows tests to pass a `LibSQLDatabase`
+  instance as the DB without needing a real D1 binding. The middleware injects it
+  into Hono context so all routes use `c.get("db")` rather than calling
+  `drizzle(c.env.DB)` directly — clean separation of construction from use.
+- **`Variables` type on Hono app:** Typed context variables (`db: DrizzleD1Database`)
+  give full type safety on `c.get("db")` throughout all route handlers.
+
+### Options considered and discarded
+- **Hand-rolled routing (original plan):** Rejected mid-increment at user request.
+  The regex matching and manual method dispatch was already getting verbose.
+
+### Dead ends / gotchas
+- None.
+
 ## Increment 5 — Refresh logic + tests
 **Date:** 2026-03-27
 **Status:** Complete
