@@ -443,3 +443,46 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 - Missing `bg-kumo-base` on `ArticleList` caused the cards to appear a different
   shade from the sidebar and reader panes. Both the populated and empty-state
   branches of the component needed the class added.
+
+---
+
+## Sidebar polish + refresh button reorganisation
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+
+**Sidebar width and resizability**
+- `Sidebar.Provider` now has `defaultWidth={280}` (up from Kumo's ~240px default),
+  `minWidth={220}`, and `resizable` — drag the edge to any width
+
+**Sidebar layout cleanup**
+- "All articles" moved into its own `Sidebar.Group` above a `Sidebar.Separator`,
+  so it's visually distinct from the per-feed list
+- "Feeds" group label moved to the feed list group where it's contextually correct
+- Footer dark-mode toggle and GitHub link converted to proper `Sidebar.MenuButton`
+  items (with icons), replacing the custom `<div>` + `<Button>` combo
+- `PlusIcon` added to "Add feed" for consistent icon treatment across footer items
+
+**Refresh button reorganisation**
+- Removed per-feed `Sidebar.MenuAction` refresh icons from every feed row — too cluttered
+- Added a single refresh-all `Sidebar.MenuAction` next to "All articles" — spins while
+  running, uses `Promise.allSettled` so one failing feed doesn't block others
+- Added per-feed refresh button in the `ArticleList` header — only shown when a single
+  feed is selected, hidden on "All articles" view
+
+### Decisions made
+- **Refresh-all on sidebar, per-feed refresh in article list header:** Matches the
+  mental model — the sidebar is navigation, the article list header is context for
+  the current view. Refresh belongs in the context, not the nav.
+- **`Promise.allSettled` for refresh-all:** Consistent with the cron handler. One
+  bad feed URL shouldn't block all others from refreshing.
+
+### Options considered and discarded
+- **Per-app colour theming (Solarized, Tokyo Night, Dracula, Nord etc.):** Explored
+  but rejected. Kumo owns its component colours via CSS `light-dark()` and `--color-kumo-*`
+  variables. Theming only the parts we own (article body, cards) while Kumo's chrome
+  stays neutral would look fragmented. Deferred indefinitely.
+
+### Dead ends / gotchas
+- None.

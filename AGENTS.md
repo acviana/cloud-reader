@@ -155,6 +155,7 @@ Uses `Promise.allSettled` — one failing feed does not abort others.
 ## Frontend Conventions
 
 - **Dark mode:** toggled via `document.documentElement.style.colorScheme`. Kumo uses CSS `light-dark()` internally so all tokens respond automatically. Never use `dark:` Tailwind prefixes.
+- **No app-wide custom theming:** Kumo owns its component colours via `light-dark()` and `--color-kumo-*` variables. Theming only the parts we own (article body, cards) while Kumo's chrome stays neutral looks fragmented. Stick to Kumo's light/dark toggle.
 - **Semantic tokens only:** use `bg-kumo-base`, `text-kumo-default` etc. Never raw Tailwind colors (`bg-blue-500`).
 - **All content panes must have `bg-kumo-base`:** the sidebar has its own background from Kumo; the article list and reader must explicitly set `bg-kumo-base` or they'll use the browser default and look wrong in dark mode.
 - **Article typography:** use the `.article-body` CSS class (defined in `app.css`) for rendered article content — NOT Tailwind's `prose` classes. `prose` doesn't use Kumo's CSS variables so colors break in dark mode. `.article-body` uses `var(--color-kumo-*)` directly.
@@ -162,6 +163,8 @@ Uses `Promise.allSettled` — one failing feed does not abort others.
 - **Article content rendering:** `marked` converts markdown → HTML. Heuristic: if content contains HTML tags treat as HTML, otherwise parse as markdown.
 - **Sort order:** article list sorts client-side by `publishedAt ?? createdAt`. Default is newest-first.
 - **Auto-mark-read:** selecting an article marks it read automatically.
+- **Refresh layout:** refresh-all is a `Sidebar.MenuAction` on the "All articles" row. Per-feed refresh is a button in the `ArticleList` header, shown only when a single feed is selected. No refresh icons on individual sidebar feed rows.
+- **Sidebar width:** `defaultWidth={280}`, `minWidth={220}`, `resizable`. Do not reduce these without good reason — feed titles need space.
 
 ## General Conventions
 

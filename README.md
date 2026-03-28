@@ -9,12 +9,14 @@ A personal RSS reader built entirely on Cloudflare — Worker, D1, and static as
 ## Features
 
 - Add RSS 2.0 and Atom feeds by URL
-- Hourly background refresh via Cloudflare cron triggers
+- Hourly background refresh via Cloudflare cron triggers; manual refresh-all or per-feed
 - Read/unread tracking, auto-mark-read on open
 - Sort articles newest or oldest first
 - Markdown and HTML article content rendering
-- Dark/light mode toggle (follows OS preference)
-- Three-pane layout: feed sidebar, article list, article reader
+- Article titles link to original posts
+- Dark/light mode toggle (follows OS preference by default)
+- Resizable three-pane layout: feed sidebar, article list, article reader
+- REST API is fully `curl`-able — no auth in phase 1
 
 ---
 
