@@ -1,10 +1,11 @@
-import { Sidebar, Badge, Button } from "@cloudflare/kumo";
+import { Sidebar, Badge } from "@cloudflare/kumo";
 import {
   RssIcon,
   ArrowsClockwiseIcon,
   GithubLogoIcon,
   MoonIcon,
   SunIcon,
+  PlusIcon,
 } from "@phosphor-icons/react";
 import type { Feed } from "@cloud-reader/types";
 
@@ -34,7 +35,7 @@ export function FeedSidebar({
   return (
     <Sidebar>
       <Sidebar.Header>
-        <div className="flex items-center gap-2 px-2 py-1">
+        <div className="flex items-center gap-2 px-2 py-2">
           <RssIcon weight="bold" className="text-kumo-brand" size={20} />
           <span className="font-semibold text-kumo-strong">cloud-reader</span>
         </div>
@@ -42,10 +43,8 @@ export function FeedSidebar({
 
       <Sidebar.Content>
         <Sidebar.Group>
-          <Sidebar.GroupLabel>Feeds</Sidebar.GroupLabel>
           <Sidebar.GroupContent>
             <Sidebar.Menu>
-              {/* All articles view */}
               <Sidebar.MenuItem>
                 <Sidebar.MenuButton
                   icon={<RssIcon />}
@@ -55,7 +54,16 @@ export function FeedSidebar({
                   All articles
                 </Sidebar.MenuButton>
               </Sidebar.MenuItem>
+            </Sidebar.Menu>
+          </Sidebar.GroupContent>
+        </Sidebar.Group>
 
+        <Sidebar.Separator />
+
+        <Sidebar.Group>
+          <Sidebar.GroupLabel>Feeds</Sidebar.GroupLabel>
+          <Sidebar.GroupContent>
+            <Sidebar.Menu>
               {feeds.map((feed) => {
                 const unread = unreadCounts[feed.id] ?? 0;
                 return (
@@ -65,7 +73,7 @@ export function FeedSidebar({
                       onClick={() => onSelectFeed(feed.id)}
                     >
                       <span className="flex-1 truncate">{feed.title ?? feed.url}</span>
-                      {unread > 0 && <Badge variant="primary">{unread}</Badge>}
+                      {unread > 0 && <Badge variant="secondary">{unread}</Badge>}
                     </Sidebar.MenuButton>
                     <Sidebar.MenuAction
                       title="Refresh feed"
@@ -87,7 +95,14 @@ export function FeedSidebar({
       <Sidebar.Footer>
         <Sidebar.Menu>
           <Sidebar.MenuItem>
-            <Sidebar.MenuButton onClick={onAddFeed}>+ Add feed</Sidebar.MenuButton>
+            <Sidebar.MenuButton icon={<PlusIcon />} onClick={onAddFeed}>
+              Add feed
+            </Sidebar.MenuButton>
+          </Sidebar.MenuItem>
+          <Sidebar.MenuItem>
+            <Sidebar.MenuButton icon={isDark ? <SunIcon /> : <MoonIcon />} onClick={onToggleDark}>
+              {isDark ? "Light mode" : "Dark mode"}
+            </Sidebar.MenuButton>
           </Sidebar.MenuItem>
           <Sidebar.MenuItem>
             <Sidebar.MenuButton
@@ -104,18 +119,7 @@ export function FeedSidebar({
             </Sidebar.MenuButton>
           </Sidebar.MenuItem>
         </Sidebar.Menu>
-        <div className="flex items-center justify-between px-2 pb-1">
-          <Button
-            variant="ghost"
-            size="xs"
-            shape="square"
-            icon={isDark ? <SunIcon /> : <MoonIcon />}
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            onClick={onToggleDark}
-          />
-          <Sidebar.Trigger />
-        </div>
+        <Sidebar.Trigger />
       </Sidebar.Footer>
     </Sidebar>
   );

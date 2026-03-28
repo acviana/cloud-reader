@@ -101,7 +101,7 @@ export function App() {
   );
 
   return (
-    <Sidebar.Provider defaultOpen className="h-full">
+    <Sidebar.Provider defaultOpen defaultWidth={280} minWidth={220} resizable className="h-full">
       <FeedSidebar
         feeds={feeds}
         selectedFeedId={selectedFeedId}
