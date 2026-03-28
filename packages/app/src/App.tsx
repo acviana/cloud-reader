@@ -109,6 +109,7 @@ export function App() {
             articles={articles}
             selectedArticleId={selectedArticleId}
             selectedFeed={selectedFeed}
+            feedsById={Object.fromEntries(feeds.map((f) => [f.id, f]))}
             onSelectArticle={handleSelectArticle}
           />
         </div>

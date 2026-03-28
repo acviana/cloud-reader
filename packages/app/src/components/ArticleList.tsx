@@ -9,6 +9,7 @@ interface ArticleListProps {
   articles: Article[];
   selectedArticleId: string | null;
   selectedFeed: Feed | null;
+  feedsById: Record<string, Feed>;
   onSelectArticle: (id: string) => void;
 }
 
@@ -16,6 +17,7 @@ export function ArticleList({
   articles,
   selectedArticleId,
   selectedFeed,
+  feedsById,
   onSelectArticle,
 }: ArticleListProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -96,11 +98,16 @@ export function ArticleList({
               {article.summary && (
                 <p className="mt-1 line-clamp-2 text-xs text-kumo-dimmed">{article.summary}</p>
               )}
-              {article.publishedAt && (
-                <p className="mt-1 text-xs text-kumo-subtle">
-                  {new Date(article.publishedAt).toLocaleDateString()}
-                </p>
-              )}
+              <div className="mt-1 flex items-center gap-2 text-xs text-kumo-subtle">
+                {!selectedFeed && (
+                  <span className="font-medium text-kumo-dimmed truncate">
+                    {feedsById[article.feedId]?.title ?? feedsById[article.feedId]?.url ?? ""}
+                  </span>
+                )}
+                {article.publishedAt && (
+                  <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                )}
+              </div>
             </button>
           </li>
         ))}
