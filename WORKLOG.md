@@ -44,6 +44,36 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 
 <!-- New increments are appended below this line -->
 
+## Increment 5 — Refresh logic + tests
+**Date:** 2026-03-27
+**Status:** Complete
+
+### What was built
+- `packages/worker/src/lib/refresh.ts` — `refreshFeed(feedId, db)`: loads feed from
+  DB, fetches RSS URL, parses XML, updates feed metadata, upserts articles (check
+  existence then insert or update), returns `{ added, updated }`.
+- `packages/worker/src/lib/test-helpers.ts` — `createTestDb()`: creates an in-memory
+  libsql database with the cloud-reader schema applied, used as a drop-in for D1 in tests.
+- `packages/worker/src/lib/refresh.test.ts` — 9 tests: added count, article storage,
+  feed metadata update, article fields, upsert on re-refresh, read flag preservation,
+  feed-not-found error, HTTP failure error, unparseable XML error.
+- `@libsql/client` added as devDependency for in-memory SQLite in tests.
+
+### Decisions made
+- **Check-then-insert upsert pattern:** D1's `onConflictDoUpdate` support in Drizzle
+  requires careful handling with the `libsql` driver in tests. Using a
+  select-then-insert-or-update pattern works identically across both D1 and libsql,
+  keeping test behavior consistent with production.
+- **`db as never` cast in tests:** The test DB is `LibSQLDatabase` but `refreshFeed`
+  takes `DrizzleD1Database`. Both share compatible Drizzle query interfaces — casting
+  avoids a complex generic type parameter on `refreshFeed` while keeping production
+  types correct.
+- **`vi.stubGlobal("fetch")` for network mocking:** No network calls in tests.
+  `fetch` is stubbed globally per test via `beforeEach`/`afterEach`.
+
+### Dead ends / gotchas
+- None.
+
 ## Increment 4 — RSS parsing + tests
 **Date:** 2026-03-27
 **Status:** Complete
