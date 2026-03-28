@@ -5,6 +5,20 @@ import type { Article, Feed } from "@cloud-reader/types";
 
 type SortOrder = "desc" | "asc";
 
+/** Strip HTML tags and decode common entities for plain-text preview. */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 interface ArticleListProps {
   articles: Article[];
   selectedArticleId: string | null;
@@ -96,7 +110,9 @@ export function ArticleList({
                 )}
               </div>
               {article.summary && (
-                <p className="mt-1 line-clamp-2 text-xs text-kumo-dimmed">{article.summary}</p>
+                <p className="mt-1 line-clamp-2 text-xs text-kumo-dimmed">
+                  {stripHtml(article.summary)}
+                </p>
               )}
               <div className="mt-1 flex items-center gap-2 text-xs text-kumo-subtle">
                 {!selectedFeed && (
