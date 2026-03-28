@@ -156,6 +156,8 @@ Uses `Promise.allSettled` — one failing feed does not abort others.
 
 - **Dark mode:** toggled via `document.documentElement.style.colorScheme`. Kumo uses CSS `light-dark()` internally so all tokens respond automatically. Never use `dark:` Tailwind prefixes.
 - **Semantic tokens only:** use `bg-kumo-base`, `text-kumo-default` etc. Never raw Tailwind colors (`bg-blue-500`).
+- **All content panes must have `bg-kumo-base`:** the sidebar has its own background from Kumo; the article list and reader must explicitly set `bg-kumo-base` or they'll use the browser default and look wrong in dark mode.
+- **Article typography:** use the `.article-body` CSS class (defined in `app.css`) for rendered article content — NOT Tailwind's `prose` classes. `prose` doesn't use Kumo's CSS variables so colors break in dark mode. `.article-body` uses `var(--color-kumo-*)` directly.
 - **HTML entities in article cards:** use `DOMParser` to strip tags and decode all entities. Never manual regex replacement.
 - **Article content rendering:** `marked` converts markdown → HTML. Heuristic: if content contains HTML tags treat as HTML, otherwise parse as markdown.
 - **Sort order:** article list sorts client-side by `publishedAt ?? createdAt`. Default is newest-first.

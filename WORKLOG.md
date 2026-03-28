@@ -404,3 +404,42 @@ work to avoid re-litigating settled decisions or repeating failed approaches.
 - `Toasty.Provider` / `Toasty.Viewport` don't exist — `Toasty` is a flat component. Removed; toast notifications deferred to phase 3.
 - Biome CSS linter flags Tailwind v4's `@source` directive as invalid. Fixed by setting `css.linter.enabled: false` in `biome.json`.
 - `useCallback` dependency order: `handleAddFeed` referenced `handleRefreshFeed` before declaration with an empty dep array. Biome's `useExhaustiveDependencies` caught this at pre-commit. Fixed by reordering.
+
+---
+
+## UI polish
+**Date:** 2026-03-28
+**Status:** Complete
+
+### What was built
+
+**Article reader layout**
+- Toolbar moved to a slim top bar (mark read + open external); header moved into the
+  scrollable content area so it scrolls with the article
+- Content constrained to `max-w-2xl` centred column for comfortable line length
+- Title bumped to `text-3xl font-bold` with tight tracking
+- `prose` / `prose-sm` classes dropped — replaced with a hand-rolled `.article-body`
+  class in `app.css` that uses Kumo CSS variables (`var(--color-kumo-*)`) directly,
+  giving correct dark mode behaviour for headings, links, code, blockquotes, lists, images
+
+**Article list cards**
+- `bg-kumo-base` added to both the populated and empty-state variants so all three
+  panes share the same background colour
+- "New" `Badge` replaced with a small `h-2 w-2 rounded-full bg-kumo-brand` dot —
+  less visually noisy
+- Spacing tightened: `mt-1.5` on summary, `mt-2` on metadata row, `gap-1.5` between metadata items
+- Separator dot between site name and date in the metadata row
+
+### Decisions made
+- **Hand-rolled `.article-body` CSS over `prose`:** Tailwind Typography's `prose`
+  classes don't use Kumo's CSS variables, so colors break in dark mode. The custom
+  class is ~80 lines and covers all the cases we need.
+- **`bg-kumo-base` on all panes:** Kumo's sidebar already has its own background.
+  Explicitly setting `bg-kumo-base` on the article list and reader ensures they
+  switch correctly with the dark mode toggle instead of defaulting to the browser's
+  background color.
+
+### Dead ends / gotchas
+- Missing `bg-kumo-base` on `ArticleList` caused the cards to appear a different
+  shade from the sidebar and reader panes. Both the populated and empty-state
+  branches of the component needed the class added.
