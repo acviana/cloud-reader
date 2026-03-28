@@ -1,0 +1,18 @@
+{
+  "name": "cloud-reader",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Personal RSS reader on Cloudflare Workers + D1",
+  "scripts": {
+    "dev": "pnpm --filter @cloud-reader/worker dev",
+    "build": "pnpm --filter @cloud-reader/app build",
+    "deploy": "pnpm --filter @cloud-reader/worker deploy",
+    "test": "pnpm -r run test",
+    "test:run": "pnpm -r run test:run",
+    "type-check": "pnpm -r run type-check"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  }
+}

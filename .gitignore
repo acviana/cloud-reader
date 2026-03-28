@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+.wrangler/
+
+# D1 local dev database
+*.db
+*.db-shm
+*.db-wal
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Editor
+.DS_Store
+*.local
+.vscode/
+.idea/
+
+# Vitest
+coverage/

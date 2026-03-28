@@ -1,0 +1,211 @@
+# cloud-reader — Agent Guide
+
+Personal RSS reader built on Cloudflare Workers and D1. This document is the
+authoritative reference for any agent or contributor working in this repository.
+Read it fully before making changes.
+
+---
+
+## What This Is
+
+A self-hosted RSS reader with:
+- A REST API backend served from a Cloudflare Worker
+- A D1 (SQLite) database for feeds and articles
+- Hourly cron-based feed refresh
+- A React frontend (Vite + Kumo component library) served as Worker static assets
+- A CLI tool for terminal access to the API (phase 3)
+
+This is a **personal, single-user application**. There is no multi-tenancy, no
+per-user auth in phase 1. Cloudflare Access (Zero Trust) is deferred to phase 3.
+
+---
+
+## Monorepo Structure
+
+```
+cloud-reader/
+├── package.json              # Root: pnpm workspace config + root scripts
+├── pnpm-workspace.yaml       # Declares packages/*
+├── tsconfig.json             # Root: base TS config, extended by all packages
+├── AGENTS.md                 # This file
+├── WORKLOG.md                # Increment-by-increment build log (agent memory)
+└── packages/
+    ├── types/                # @cloud-reader/types  — shared TS types
+    ├── worker/               # @cloud-reader/worker — CF Worker + D1 API + cron
+    ├── app/                  # @cloud-reader/app    — React frontend (phase 2)
+    └── cli/                  # @cloud-reader/cli    — CLI tool (phase 3)
+```
+
+### Package purposes
+
+| Package | Description |
+|---------|-------------|
+| `@cloud-reader/types` | Shared `Feed`, `Article`, `NewFeed`, `NewArticle` TypeScript interfaces. No runtime code — types only. Imported by worker, app, and cli. |
+| `@cloud-reader/worker` | Cloudflare Worker. Owns the REST API, D1 queries via Drizzle, RSS fetching/parsing, and the hourly cron handler. |
+| `@cloud-reader/app` | React SPA built with Vite. Uses `@cloudflare/kumo` component library. Served as static assets from the worker. |
+| `@cloud-reader/cli` | Node.js CLI binary. Makes HTTP calls to the deployed worker REST API. Phase 3 — not yet scaffolded. |
+
+---
+
+## Stack
+
+| Layer | Technology | Why |
+|-------|-----------|-----|
+| Runtime | Cloudflare Workers | Edge deployment, free tier, native D1 binding |
+| Database | Cloudflare D1 (SQLite) | Serverless SQLite, integrated with Workers, supports Drizzle |
+| ORM | Drizzle ORM + drizzle-kit | Type-safe queries, proper migration support for D1, no `PRAGMA user_version` issues |
+| RSS parsing | `fast-xml-parser` | Pure JS, no native deps, works in Workers runtime, handles RSS 2.0 + Atom |
+| Frontend | React + Vite | Standard SPA setup, good Kumo compatibility |
+| UI components | `@cloudflare/kumo` | Cloudflare's own component library, built on Base UI, Tailwind v4 |
+| Testing | Vitest | Fast, native ESM, works in Node for D1 tests |
+| Monorepo | pnpm workspaces | Strict dependency isolation, fast installs, consistent with Kumo and vega repos |
+| Language | TypeScript (strict) | `strict: true` + `noUncheckedIndexedAccess` throughout |
+
+---
+
+## Key Design Decisions
+
+### D1 over Durable Objects
+Originally planned to use a Durable Object with SQLite for serialized DB access.
+Switched to D1 because: this is a single-user app with no meaningful write
+concurrency, D1 gives better tooling (dashboard query console, drizzle-kit
+migrations), and the DO added architectural complexity with no real benefit.
+
+### REST API (not RPC)
+The Worker exposes a plain HTTP REST API. This makes it directly `curl`-able and
+CLI-friendly without any translation layer. All endpoints return JSON.
+
+### Worker serves the frontend
+The React app is built to `packages/app/dist/` by Vite, then served as static
+assets from the Worker via the `assets` binding. NOT Cloudflare Pages. This keeps
+everything in one deployment unit.
+
+### Shared types package
+`@cloud-reader/types` contains the canonical `Feed` and `Article` interfaces.
+All packages import from here. Never define these types inline in worker or app code.
+
+### Drizzle migrations
+Schema changes go through `drizzle-kit generate` (produces SQL in `packages/worker/drizzle/`)
+then `wrangler d1 migrations apply` to apply locally or remotely. Never manually
+edit generated migration files.
+
+---
+
+## Data Model
+
+### `feeds`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `text` PK | `crypto.randomUUID()` |
+| `url` | `text` UNIQUE NOT NULL | The RSS/Atom feed URL |
+| `title` | `text` | From feed `<title>` |
+| `site_url` | `text` | From feed `<link>` |
+| `description` | `text` | From feed `<description>` / `<subtitle>` |
+| `image_url` | `text` | From feed `<image>` or `<itunes:image>` |
+| `last_fetched_at` | `integer` | Unix ms, updated on each successful refresh |
+| `created_at` | `integer` | Unix ms, set on insert |
+
+### `articles`
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `text` PK | `crypto.randomUUID()` |
+| `feed_id` | `text` FK → `feeds.id` ON DELETE CASCADE | |
+| `url` | `text` UNIQUE NOT NULL | Upsert key |
+| `title` | `text` | |
+| `summary` | `text` | `<description>` excerpt |
+| `content` | `text` | `<content:encoded>` full body |
+| `published_at` | `integer` | Unix ms |
+| `read` | `integer` NOT NULL DEFAULT 0 | 0 = unread, 1 = read |
+| `created_at` | `integer` | Unix ms, set on insert, NOT updated on upsert |
+
+### Indexes
+- `idx_articles_feed_id` on `articles(feed_id)`
+- `idx_articles_read` on `articles(read)`
+- `idx_articles_published_at` on `articles(published_at DESC)`
+
+---
+
+## REST API
+
+Base path: `/api`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/feeds` | List all feeds |
+| `POST` | `/api/feeds` | Add feed `{ url: string }` → `201` |
+| `DELETE` | `/api/feeds/:id` | Delete feed + cascade articles → `204` |
+| `POST` | `/api/feeds/:id/refresh` | Manually refresh feed → `200 { added, updated }` |
+| `GET` | `/api/articles` | List articles. Query params: `feed_id`, `unread=true` |
+| `PATCH` | `/api/articles/:id` | Update article `{ read: boolean }` → `200` |
+
+All error responses: `{ error: string }` with appropriate HTTP status.
+
+---
+
+## Cron
+
+Runs hourly (`0 * * * *`). Calls `refreshFeed()` for every feed in D1.
+Uses `Promise.allSettled` — one failing feed does not abort others.
+
+---
+
+## Conventions
+
+- **Exports:** named exports only, no default exports except in `vite.config.ts` and worker entry
+- **File naming:** `kebab-case.ts`, test files colocated as `foo.test.ts`
+- **Error handling:** Worker endpoints return `{ error: string }` JSON, never throw to the client
+- **Types:** always import from `@cloud-reader/types`, never redefine inline
+- **SQL:** Drizzle query builder for all queries, raw `sql` template tag only when necessary
+- **IDs:** always `crypto.randomUUID()`
+- **Timestamps:** always Unix milliseconds (`Date.now()`), stored as `integer`
+
+---
+
+## Commands
+
+```bash
+# Install all dependencies
+pnpm install
+
+# Run worker in local dev mode (with local D1)
+pnpm dev
+
+# Run all tests
+pnpm test
+
+# Run tests once (CI mode)
+pnpm test:run
+
+# Type-check all packages
+pnpm type-check
+
+# Build the frontend
+pnpm build
+
+# Deploy worker + frontend to Cloudflare
+pnpm deploy
+
+# Generate Drizzle migration from schema changes
+pnpm --filter @cloud-reader/worker db:generate
+
+# Apply migrations locally
+pnpm --filter @cloud-reader/worker db:migrate
+
+# Apply migrations to production
+pnpm --filter @cloud-reader/worker db:migrate:remote
+
+# Open Drizzle Studio (local DB browser)
+pnpm --filter @cloud-reader/worker db:studio
+```
+
+---
+
+## Phase Roadmap
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| 1 | In progress | API layer — Worker, D1, REST endpoints, cron, Vitest |
+| 2 | Pending | Frontend — React, Vite, Kumo, static assets |
+| 3 | Deferred | Auth (Cloudflare Access), CLI tool, FTS5 search, OPML import/export |
+
+See `WORKLOG.md` for increment-by-increment progress and decisions.
